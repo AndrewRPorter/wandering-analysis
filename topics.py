@@ -23,19 +23,22 @@ def run():
 
     stemmed_tokens = []
     for tokens in pruned_tokens:
-        tokens = [stemmer.stem(token) for token in tokens]
         tokens = [token for token in tokens if not token == "think"]
         stemmed_tokens.append(tokens)
 
     dictionary = corpora.Dictionary(stemmed_tokens)
     corpus = [dictionary.doc2bow(text) for text in stemmed_tokens]
-    ldamodel = models.ldamodel.LdaModel(corpus, num_topics=10, id2word=dictionary, passes=20)
-    
-    print(ldamodel.print_topics(num_topics=10, num_words=1))
-    print()
-    print(ldamodel.print_topics(num_topics=10, num_words=2))
-    print()
-    print(ldamodel.print_topics(num_topics=10, num_words=3))
+
+    topics = set()
+
+    # for some reason, eadh iteration of LdaModel yields different results...
+    for i in range(0, 5):
+        ldamodel = models.ldamodel.LdaModel(corpus, num_topics=15, id2word=dictionary, passes=50)
+        temp_topics = ldamodel.print_topics(num_topics=15, num_words=1)
+        for topic in temp_topics:
+            topics.add(topic[1].replace('"', "").split("*")[1])  # get just word as output
+
+    print(topics)
 
 
 def get_docs():
