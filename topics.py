@@ -29,14 +29,19 @@ def run():
     dictionary = corpora.Dictionary(stemmed_tokens)
     corpus = [dictionary.doc2bow(text) for text in stemmed_tokens]
 
-    topics = set()
+    topics = {}
 
     # for some reason, eadh iteration of LdaModel yields different results...
     for i in range(0, 5):
-        ldamodel = models.ldamodel.LdaModel(corpus, num_topics=15, id2word=dictionary, passes=50)
-        temp_topics = ldamodel.print_topics(num_topics=15, num_words=1)
+        ldamodel = models.ldamodel.LdaModel(corpus, num_topics=5, id2word=dictionary, passes=50)
+        temp_topics = ldamodel.print_topics(num_topics=5, num_words=1)
         for topic in temp_topics:
-            topics.add(topic[1].replace('"', "").split("*")[1])  # get just word as output
+            topic = topic[1].replace('"', "").split("*")[1]
+
+            if topic in topics:
+                topics[topic] += 1
+            else:
+                topics[topic] = 1
 
     print(topics)
 

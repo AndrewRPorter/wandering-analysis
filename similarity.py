@@ -32,16 +32,18 @@ def text_to_vector(text):
     return Counter(words)
 
 
-def get_closest():
+def get_closest(user: str, numbers=False):
     response_to_topics = []
-    data = data_helper.get_data()
 
-    for response in data_helper.get_sorted_responses(data):
-        closest = (-1, None)
-        for topic in topics:
+    for response in data_helper.get_sorted_responses(user):
+        closest = (-1, 9)
+        for index, topic in enumerate(topics):
 
             if topic in response[0]:
-                closest = (1, topic)
+                if numbers:
+                    closest = (1, index+1)
+                else:
+                    closest = (1, topic)
                 break
 
             text1 = topic
@@ -53,10 +55,16 @@ def get_closest():
             cosine = get_cosine(word_vector_one, word_vector_two)
 
             if cosine == 0.0:
-                closest = (-1, "other")  # no topic found
+                if numbers:
+                    closest = (-1, 6)  # no topic found
+                else:
+                    closest = (-1, "other")  # no topic found
 
             if cosine > closest[0]:
-                closest = (cosine, topic)
+                if numbers:
+                    closest = (cosine, index+1)
+                else:
+                    closest = (cosine, topic)
 
         response_to_topics.append((response, closest[1]))
 

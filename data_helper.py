@@ -40,20 +40,28 @@ def get_data():
     return pd.read_csv(RESPONSES)
 
 
-def get_sorted_responses(data: pd.DataFrame):
+def get_users():
+    df = get_data()
+    users = set()
+
+    for _, row in df.dropna().iterrows():
+        users.add(row.users)
+
+    return list(users)
+
+
+def get_sorted_responses(user: str):
     responses = []
-    current_user = None
+    current_user = user
 
-    for index, row in data.iterrows():
+    for index, row in get_data().iterrows():
         row = dict(row)
-        if not current_user:
-            current_user = row["users"]
-
-        if row["users"] != current_user and str(row["users"]) != "nan":
-            break  # we only want to process one user for right now
+        if row["users"] != current_user:
+            continue
 
         if len(row["response"].strip()) > 1:  # only want thought data
             responses.append((row["response"], row["responseTimestamp"]))
 
     sorted_response = sorted(responses, key=lambda x: x[1])
+
     return sorted_response
